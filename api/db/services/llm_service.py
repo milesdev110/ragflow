@@ -52,8 +52,13 @@ class TenantLLMService(CommonService):
     @classmethod
     @DB.connection_context()
     def get_my_llms(cls, tenant_id):
+        tenants = TenantService.get_joined_tenants_by_user_id(tenant_id)
+        tenant_ids = [t["tenant_id"] for t in tenants]
+
+        logging.warning("Current tenant ID: %s, All tenant IDs: %s", tenant_id, tenant_ids)
+
         fields = [cls.model.llm_factory, LLMFactories.logo, LLMFactories.tags, cls.model.model_type, cls.model.llm_name, cls.model.used_tokens]
-        objs = cls.model.select(*fields).join(LLMFactories, on=(cls.model.llm_factory == LLMFactories.name)).where(cls.model.tenant_id == tenant_id, ~cls.model.api_key.is_null()).dicts()
+        objs = cls.model.select(*fields).join(LLMFactories, on=(cls.model.llm_factory == LLMFactories.name)).where(cls.model.tenant_id << tenant_ids, ~cls.model.api_key.is_null()).dicts()
 
         return list(objs)
 
