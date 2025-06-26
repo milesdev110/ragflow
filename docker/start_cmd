@@ -1,0 +1,17 @@
+# restart all exited containers
+docker ps -a --filter "status=exited" --format "{{.ID}}" | xargs docker start
+# start, (Container ID WILL CHANGE!!!)
+docker compose -f docker-compose.yml up -d
+# Get all Containers
+docker ps -a
+# Get running Containers
+docker ps
+#
+docker restart ragflow-server
+docker exec -it  ragflow-server  /bin/bash
+
+# 示例：将本地的 ./src 挂载到容器的 /code
+docker run -v $(pwd)/api:/ragflow/api  ragflow-server
+
+# 示例：将本地的 ./data 文件夹复制到容器的 /app/data
+docker cp ./api  ragflow-server:/ragflow/api 
